@@ -1,28 +1,35 @@
+#include "utf.hpp"
+#include "hill.hpp"
+
 #include <iostream>
 #include <iomanip>
 #include <string>
 #include <algorithm>
+#include <fstream>
+#include <filesystem>
 #include <locale>
 #include <numeric>
 #include <optional>
 #include <sstream>
 #include <type_traits>
+#include <functional>
+
 
 using namespace std;
+using namespace hse;
+namespace fs = filesystem;
 
-constexpr int alphabet_size = 32;
+namespace  {
+
 constexpr const char* whitespaces = " \t\f\v\n\r";
 
-struct cipher_params
-{
-    int a, b;
-};
+}
 
 template <typename T, typename = enable_if_t<!std::is_same<T, std::string>::value>>
 optional<T> check_input(string input_str)
 {
     T value;
-    istringstream in(std::move(input_str));
+    stringstream in(std::move(input_str));
     if(!(in >> value) && in.str().find_first_of(whitespaces)==string::npos)
     {
         return nullopt;
@@ -33,8 +40,8 @@ optional<T> check_input(string input_str)
 template<typename Func>
 auto input_repeater(Func function)
 {
-again:
 
+again:
     auto result = function();
 
     if(result == nullopt){
@@ -46,10 +53,10 @@ again:
     return *result;
 }
 
-optional<cipher_params> init_params()
+optional<hill_cipher> get_cipher()
 {
     cout << u8"Введите параметные a, b шифра Хилла (y = a*x+b(mod n)) \n"
-         << "a=";
+          << u8"a=";
 
     string buffer;
     buffer.reserve(128);
@@ -60,7 +67,7 @@ optional<cipher_params> init_params()
         success &= ((*a_opt %= alphabet_size)==1) || gcd(*a_opt, alphabet_size);
 
 
-    cout << "b=";
+    cout << u8"b=";
     success &= static_cast<bool>(getline(cin, buffer));
     auto b_opt = check_input<int>(std::move(buffer));
     success &= b_opt!=nullopt;
@@ -68,55 +75,47 @@ optional<cipher_params> init_params()
     if(!success)
         return nullopt;
 
-    return cipher_params{*a_opt, *b_opt % alphabet_size};
-}
-
-void enable_utf8()
-{
-    try {
-
-#ifdef WINDOWS_PLATFORM
-        setlocale(LC_ALL, "Russian_Russia.65001");
-#else
-        locale::global(locale("ru_RU.UTF-8"));
-#endif
-
-    } catch (runtime_error&) {
-        cerr << "No UTF-8 support on system. Please provide it and rerun the programm.\n";
-    } catch(...)
-    {
-        cerr << "\nUnrecognised error\n";
-        throw ;
-    }
+    return hill_cipher(*a_opt, *b_opt % alphabet_size);
 }
 
 
-optional<string> read_open_text()
+optional<fs::path> get_text_filename()
 {
-    cout << u8"Введите открытый текст.\n";
-    string open_text;
-
-    open_text.reserve(256);
-    if(!(std::getline(cin, open_text)))
+    cout << u8"Введите имя файла с открытым текстом.\n";
+    fs::path file;
+    if(!(cin>>file) || !(fs::exists(file) && fs::is_regular_file(file)))
         return nullopt;
-    return open_text;
+    return file;
 }
 
-string encrypt(string text, cipher_params params)
+// TO FIX
+string exctract_text(fs::path input_file)
 {
+    ifstream in(move(input_file).string());
 
+    in.seekg(0, ios_base::end);
+    string text;
+    text.reserve(in.tellg());
+    in.seekg(0, ios_base::beg);
+
+    text.assign(istreambuf_iterator<char>(in),
+                istreambuf_iterator<char>());
+
+    return text;
 }
-
-string decrypt(string text, cipher_params params)
-{
-
-}
-
 
 int main() {
-    enable_utf8();
-//    cipher_params params = input_repeater(init_params);
-    string open_text = input_repeater(read_open_text);
-    std::cout << open_text << '\n';
-    std::cout << u8"Тест test 1234\n";
+
+    // unix only
+    locale::global(locale("ru_RU.UTF-8"));
+
+    fs::path input_file = input_repeater(get_text_filename);
+    string open_text  = "Введённый текст"; // exctract_text(move(input_file));
+
+    hill_cipher cipher = input_repeater(get_cipher);
+
+    string encoded_text = cipher.encode(open_text);
+    string decoded_text = cipher.decode(encoded_text);
+    cout << encoded_text << u8'\n'
+         << decoded_text << u8'\n';
 }
