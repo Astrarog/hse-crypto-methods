@@ -1,4 +1,4 @@
-#include "utf.hpp"
+﻿#include "utf.hpp"
 #include "hill.hpp"
 
 #include <iostream>
@@ -93,7 +93,7 @@ optional<fs::path> get_text_filename()
     return file;
 }
 
-// TO FIX
+
 string exctract_text(fs::path input_file)
 {
     ifstream in(move(input_file).string());
@@ -111,17 +111,18 @@ string exctract_text(fs::path input_file)
 
 int main() {
 
-    cout << unicode_to_utf8(utf8_to_unicode(u8"Введённый текст¢𐍈")) << u8'\n';
     // unix only
     locale::global(locale("ru_RU.UTF-8"));
 
     fs::path input_file = input_repeater(get_text_filename);
-    string open_text  = u8"Введённый текст"; // exctract_text(move(input_file));
+    string open_text  = exctract_text(move(input_file));
+
+    cout << u8"Текст из файла: " << quoted(open_text) << '\n';
 
     hill_cipher cipher = input_repeater(get_cipher);
 
     string encoded_text = cipher.encode(open_text);
     string decoded_text = cipher.decode(encoded_text);
-    cout << encoded_text << '\n'
-         << decoded_text << '\n';
+    cout << u8"Шифртекст: " << quoted(encoded_text) << '\n'
+         << u8"Декодированный текст: " << quoted(decoded_text) << '\n';
 }
