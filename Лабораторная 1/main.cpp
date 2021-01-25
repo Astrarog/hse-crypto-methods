@@ -81,7 +81,7 @@ optional<hill_cipher> get_cipher()
 
 optional<fs::path> get_text_filename()
 {
-    cout << u8"Введите имя файла с открытым текстом.\n";
+    cout << u8"Введите имя файла с открытым текстом: ";
     fs::path file;
 
     string buffer;

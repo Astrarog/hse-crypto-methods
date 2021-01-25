@@ -27,6 +27,10 @@ public:
 
 };
 
+uint32_t little_russia_to_int(uint32_t c);
+uint32_t int_to_little_russia(uint32_t c);
+uint32_t big_russia_to_int(uint32_t c);
+uint32_t int_to_big_russia(uint32_t c);
 }
 
 #endif // HILL_HPP
