@@ -56,7 +56,7 @@ again:
 optional<hill_cipher> get_cipher()
 {
     cout << u8"Введите параметные a, b шифра Хилла (y = a*x+b(mod n)) \n"
-          << u8"a=";
+         << u8"a=";
 
     string buffer;
     buffer.reserve(128);
@@ -83,7 +83,12 @@ optional<fs::path> get_text_filename()
 {
     cout << u8"Введите имя файла с открытым текстом.\n";
     fs::path file;
-    if(!(cin>>file) || !(fs::exists(file) && fs::is_regular_file(file)))
+
+    string buffer;
+    getline(cin, buffer);
+
+    istringstream sin (buffer);
+    if(!(sin>>file) || (sin.rdbuf()->in_avail()) || !(fs::exists(file) && fs::is_regular_file(file)))
         return nullopt;
     return file;
 }
@@ -106,16 +111,17 @@ string exctract_text(fs::path input_file)
 
 int main() {
 
+    cout << unicode_to_utf8(utf8_to_unicode(u8"Введённый текст¢𐍈")) << u8'\n';
     // unix only
     locale::global(locale("ru_RU.UTF-8"));
 
     fs::path input_file = input_repeater(get_text_filename);
-    string open_text  = "Введённый текст"; // exctract_text(move(input_file));
+    string open_text  = u8"Введённый текст"; // exctract_text(move(input_file));
 
     hill_cipher cipher = input_repeater(get_cipher);
 
     string encoded_text = cipher.encode(open_text);
     string decoded_text = cipher.decode(encoded_text);
-    cout << encoded_text << u8'\n'
-         << decoded_text << u8'\n';
+    cout << encoded_text << '\n'
+         << decoded_text << '\n';
 }
