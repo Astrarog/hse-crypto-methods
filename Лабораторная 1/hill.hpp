@@ -20,7 +20,7 @@ class hill_cipher
 
 public:
 
-    constexpr hill_cipher(int a_, int b_);
+    hill_cipher(int a_, int b_);
 
     std::string encode(std::string text);
     std::string decode(std::string text);

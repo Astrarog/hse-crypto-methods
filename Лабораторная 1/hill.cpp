@@ -20,12 +20,17 @@ inline uint32_t YA_code(){ return utf8_to_unicode(u8"Я")[0]; }
 }
 
 
-bool is_russian_letter(uint32_t c){
-    return ((a_code() <= c && c <= ya_code()) || (A_code() <=  c  && c <= YA_code()));
+inline bool is_litte_russian(uint32_t c){
+    return (a_code() <= c && c <= ya_code());
+}
+
+inline bool is_big_russian(uint32_t c){
+    return (A_code() <=  c  && c <= YA_code());
 }
 
 
-constexpr hill_cipher::hill_cipher(int a_, int b_): a(a_), b(b_)
+
+hill_cipher::hill_cipher(int a_, int b_): a(a_), b(b_)
 {
     for (inv_a = 1; inv_a<alphabet_size; ++inv_a){
         if (inv_a * a % alphabet_size == 1)
@@ -36,15 +41,18 @@ constexpr hill_cipher::hill_cipher(int a_, int b_): a(a_), b(b_)
 string hill_cipher::transform(string text,
                  function<uint32_t(uint32_t)> transformation)
 {
-    vector<uint32_t> text_symbols = utf8_to_unicode(text);
+    vector<uint32_t> text_symbols = utf8_to_unicode(move(text));
     for(auto& c: text_symbols)
     {
-        if (is_russian_letter(c))
+        if (is_litte_russian(c))
         {
-            c = transformation(c);
+            c = transformation(c - a_code()) + a_code();
+        } else if(is_big_russian(c))
+        {
+            c = transformation(c - A_code()) + A_code();
         }
     }
-    text = unicode_to_utf8(text_symbols);
+    text = unicode_to_utf8(move(text_symbols));
     return text;
 }
 
