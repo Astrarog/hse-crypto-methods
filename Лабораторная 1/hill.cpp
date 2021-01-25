@@ -34,11 +34,13 @@ inline bool is_big_russian(uint32_t c){
 
 
 
-hill_cipher::hill_cipher(int a_, int b_): a(a_), b(b_)
+hill_cipher::hill_cipher(uint32_t a_, uint32_t b_): a(a_), b(b_)
 {
-    for (inv_a = 1; inv_a<alphabet_size; ++inv_a){
-        if (inv_a * a % alphabet_size == 1)
+    for (uint32_t inv = 1; inv<alphabet_size; ++inv){
+        if ((inv * a) % alphabet_size == 1){
+            inv_a = inv;
             return;
+        }
     }
 }
 
@@ -135,7 +137,7 @@ string hill_cipher::encode(string text)
 {
     return transform(move(text),
                      [this]
-                     (uint32_t c) { return (a * c + b) % alphabet_size;}
+                     (uint32_t x) { return (a * x + b) % alphabet_size; }
     );
 }
 
@@ -143,7 +145,10 @@ string hill_cipher::decode(string text)
 {
     return transform(move(text),
                      [this]
-                     (uint32_t c){ return inv_a * (c - b) % alphabet_size; }
+                     (uint32_t y){
+                        if(y < b) y+=alphabet_size;
+                        return (inv_a * (y - b)) % alphabet_size;
+                     }
     );
 }
 

@@ -62,19 +62,21 @@ optional<hill_cipher> get_cipher()
     buffer.reserve(128);
 
     bool success = static_cast<bool>(getline(cin, buffer));
-    auto a_opt = check_input<int>(std::move(buffer));
+    auto a_opt = check_input<int64_t>(std::move(buffer));
     if(a_opt!=nullopt)
         success &= ((*a_opt %= alphabet_size)==1) || gcd(*a_opt, alphabet_size);
 
 
     cout << u8"b=";
     success &= static_cast<bool>(getline(cin, buffer));
-    auto b_opt = check_input<int>(std::move(buffer));
+    auto b_opt = check_input<int64_t>(std::move(buffer));
     success &= b_opt!=nullopt;
 
     if(!success)
         return nullopt;
 
+    *a_opt += alphabet_size; *a_opt %= alphabet_size;
+    *b_opt += alphabet_size; *b_opt %= alphabet_size;
     return hill_cipher(*a_opt, *b_opt % alphabet_size);
 }
 

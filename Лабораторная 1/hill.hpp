@@ -13,14 +13,14 @@ constexpr int alphabet_size = 33;
 
 class hill_cipher
 {
-    int a, b, inv_a=-1;
+    uint32_t a, b, inv_a=0;
 
     std::string transform(std::string text,
                      std::function<uint32_t(uint32_t)> transformation);
 
 public:
 
-    hill_cipher(int a_, int b_);
+    hill_cipher(uint32_t a_, uint32_t b_);
 
     std::string encode(std::string text);
     std::string decode(std::string text);
