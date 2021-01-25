@@ -116,7 +116,7 @@ string unicode_to_utf8(const vector<uint32_t>& data)
         for(unsigned int i = 1; i<need_octets; ++i)
         {
             reverse_symol.push_back((middle_prefix << MIDDLE_POSTITION) ^ (letter & middle_mask));
-            letter >>= 8;
+            letter >>= MIDDLE_POSTITION;
         }
 
         uint32_t prefix, prefix_shift, mask;
