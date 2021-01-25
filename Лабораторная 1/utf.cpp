@@ -59,29 +59,31 @@ vector<uint32_t> utf8_to_unicode(const string& text)
     data.reserve(text.size());
     for(size_t i = 0; i<text.size(); ++i)
     {
-        uint32_t letter;
+        uint32_t letter=0;
         switch (utf8_symbol_type(text[i])) {
         case SINGLE_BYTE:
-            letter = text[i]&single_mask;
+            letter ^= text[i];
             break;
         case DOUBLE_BEGINNING:
-            letter = ((text[i] & double_mask) << data_shift) ^
-                      (text[i+1] & middle_mask);
+            letter ^= (text[i]  & double_mask); letter<<=data_shift;
+            letter ^= (text[i+1]& middle_mask);
             i+=1;
             break;
         case TRIPPLE_BEGINNING:
-            letter = ((text[i] & tripple_mask) << data_shift) ^
-                     ((text[i+1]& middle_mask) << data_shift) ^
-                      (text[i+2]& middle_mask);
+            letter ^= (text[i]  & tripple_mask); letter<<=data_shift;
+            letter ^= (text[i+1]& middle_mask);  letter<<=data_shift;
+            letter ^= (text[i+2]& middle_mask);
             i+=2;
+            break;
         case QUATRO_BEGINNING:
-            letter = ((text[i] & quatro_mask)  << data_shift) ^
-                     ((text[i+1]& middle_mask) << data_shift) ^
-                     ((text[i+2]& middle_mask) << data_shift) ^
-                      (text[i+3]& middle_mask);
+            letter ^= (text[i]  & quatro_mask); letter<<=data_shift;
+            letter ^= (text[i+1]& middle_mask); letter<<=data_shift;
+            letter ^= (text[i+2]& middle_mask); letter<<=data_shift;
+            letter ^= (text[i+3]& middle_mask);
             i+=3;
+            break;
         case MIDDLE_POSTITION:
-            // should not be here
+            // should not be here casue have taken into account in all other cases
             throw std::logic_error("Get middle position while ut8 to unocode encoding");
         }
         data.push_back(letter);
