@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
 project(Hill LANGUAGES CXX)
 
-add_executable(${PROJECT_NAME} "main.cpp" "utf.cpp" "utf.hpp" "hill.cpp" ""hill.hpp)
+add_executable(${PROJECT_NAME} "main.cpp" "utf.cpp" "utf.hpp" "hill.cpp" "hill.hpp")
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 

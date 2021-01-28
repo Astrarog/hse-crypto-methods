@@ -5,6 +5,7 @@
 #include <vector>
 #include <numeric>
 #include <functional>
+#include <stdexcept>
 
 namespace hse {
 
