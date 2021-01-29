@@ -2,19 +2,32 @@
 
 #include <vector>
 #include <string>
-#include <numeric>
+#include <cstdint>
 #include <stdexcept>
 
 namespace hse {
 
 using namespace std;
 
-bool check_prefix(char letter, char prefix)
+constexpr inline uint32_t  single_mask = 0b01111111;
+constexpr inline uint32_t  double_mask = 0b00011111;
+constexpr inline uint32_t tripple_mask = 0b00001111;
+constexpr inline uint32_t  quatro_mask = 0b00000111;
+constexpr inline uint32_t  middle_mask = 0b00111111;
+
+constexpr inline uint32_t  single_prefix = 0b0;
+constexpr inline uint32_t  double_prefix = 0b110;
+constexpr inline uint32_t tripple_prefix = 0b1110;
+constexpr inline uint32_t  quatro_prefix = 0b11110;
+constexpr inline uint32_t  middle_prefix = 0b10;
+
+constexpr inline uint32_t data_shift = 6;
+
+constexpr bool check_prefix(char letter, char prefix) noexcept
 {
     unsigned int prefix_shift = [&prefix]{
-        unsigned int first_nonzero_shift;
-        for(first_nonzero_shift=7;
-            first_nonzero_shift && !(0x1<<first_nonzero_shift & prefix);
+        unsigned int first_nonzero_shift = 7;
+        for(; first_nonzero_shift && !(0x1<<first_nonzero_shift & prefix);
             --first_nonzero_shift) {}
         return 7-first_nonzero_shift;
     }();
@@ -31,7 +44,7 @@ bool check_prefix(char letter, char prefix)
 
 }
 
-UNICODE_POSITION utf8_symbol_type(char c)
+constexpr UNICODE_POSITION utf8_symbol_type(char c)
 {
     if(check_prefix(c, single_prefix)) { //case 0b0xxxxxxx (complite)
         return SINGLE_BYTE;
@@ -91,7 +104,7 @@ vector<uint32_t> utf8_to_unicode(const string& text)
     return data;
 }
 
-unsigned int needed_ut8_otcets(uint32_t letter_code)
+constexpr unsigned int needed_ut8_otcets(uint32_t letter_code)
 {
     if(letter_code <= 0x7F)
         return 1;

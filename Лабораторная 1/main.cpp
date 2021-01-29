@@ -1,5 +1,6 @@
 ﻿#include "utf.hpp"
 #include "hill.hpp"
+#include "rus.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -55,7 +56,7 @@ again:
 
 optional<hill_cipher> get_cipher()
 {
-    cout << u8"Введите параметные a, b шифра Хилла (y = a*x+b(mod n)) \n"
+    cout << u8"Введите параметные a, b шифра Хилла (y = a*x+b(mod n), n=33) \n"
          << u8"a=";
 
     string buffer;
@@ -77,7 +78,7 @@ optional<hill_cipher> get_cipher()
 
     *a_opt += alphabet_size; *a_opt %= alphabet_size;
     *b_opt += alphabet_size; *b_opt %= alphabet_size;
-    return hill_cipher(*a_opt, *b_opt % alphabet_size);
+    return hill_cipher(*a_opt, *b_opt % alphabet_size, alphabet_size);
 }
 
 
@@ -112,9 +113,6 @@ string exctract_text(fs::path input_file)
 }
 
 int main() {
-
-    // unix only
-    locale::global(locale("ru_RU.UTF-8"));
 
     fs::path input_file = input_repeater(get_text_filename);
     string open_text  = exctract_text(move(input_file));
