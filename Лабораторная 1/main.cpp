@@ -117,7 +117,7 @@ int main() {
     fs::path input_file = input_repeater(get_text_filename);
     string open_text  = exctract_text(move(input_file));
 
-    cout << u8"Текст из файла: " << quoted(open_text) << '\n';
+    cout << u8"Текст из файла: \n" << quoted(open_text) << '\n';
 
     hill_cipher cipher = input_repeater(get_cipher);
 
