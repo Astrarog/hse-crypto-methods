@@ -112,17 +112,44 @@ string exctract_text(fs::path input_file)
     return text;
 }
 
+vector<uint32_t> russian_to_int(const string& text){
+    auto unicodes = utf8_to_unicode(text);
+    for(auto& c: unicodes)
+    {
+        if(auto res = russia_to_int(c); res!=alphabet_size)
+            c=res;
+        else
+            c=alphabet_size;
+    }
+    auto pos = remove(unicodes.begin(), unicodes.end(), alphabet_size);
+    unicodes.erase(pos, unicodes.end());
+    return unicodes;
+};
+
 int main() {
 
     fs::path input_file = input_repeater(get_text_filename);
     string open_text  = exctract_text(move(input_file));
 
-    cout << u8"Текст из файла: \n" << quoted(open_text) << '\n';
+    cout << u8"Текст из файла:\n" << quoted(open_text) << '\n';
 
     hill_cipher cipher = input_repeater(get_cipher);
 
+    vector<uint32_t> open_text_codes = russian_to_int(open_text);
+
+    cout << u8"Численное представление исходного текста\n";
+    for(auto c: open_text_codes)
+        cout << c << ' ';
+    cout << '\n';
+
     string encoded_text = cipher.encode(open_text);
     string decoded_text = cipher.decode(encoded_text);
-    cout << u8"Шифртекст: " << quoted(encoded_text) << '\n'
-         << u8"Декодированный текст: " << quoted(decoded_text) << '\n';
+    cout << u8"Шифртекст:\n" << quoted(encoded_text) << '\n'
+         << u8"Декодированный текст:\n" << quoted(decoded_text) << '\n';
+
+    vector<uint32_t> encoded_text_codes = russian_to_int(encoded_text);
+    cout << u8"Численное представление шифртекста\n";
+    for(auto c: encoded_text_codes)
+        cout << c << ' ';
+    cout << '\n';
 }

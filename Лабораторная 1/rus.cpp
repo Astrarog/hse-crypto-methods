@@ -27,6 +27,11 @@ bool is_big_russian(uint32_t c) noexcept {
 }
 
 
+bool is_russian(uint32_t c) noexcept {
+    return is_litte_russian(c)||is_big_russian(c);
+}
+
+
 uint32_t little_russia_to_int(uint32_t c)
 {
     if (a_code <= c && c <= ye_code)
@@ -90,6 +95,15 @@ uint32_t int_to_big_russia(uint32_t c)
     if (YE < c && c <= YA)
         return c-1+A_code;
     throw std::logic_error("Not russian letter in int_to_big_russia");
+}
+
+uint32_t russia_to_int(uint32_t c)
+{
+    if(is_big_russian(c))
+        return big_russia_to_int(c);
+    else if(is_litte_russian(c))
+        return little_russia_to_int(c);
+    return alphabet_size;
 }
 
 
