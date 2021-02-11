@@ -56,7 +56,7 @@ again:
 
 optional<hill_cipher> get_cipher()
 {
-    cout << u8"Введите параметные a, b шифра Хилла (y = a*x+b(mod n), n=33) \n"
+    cout << u8"Введите параметные a, b шифра Хилла (y = a*x+b(mod n), n=33; НОД(a, n)==1) \n"
          << u8"a=";
 
     string buffer;
@@ -64,9 +64,9 @@ optional<hill_cipher> get_cipher()
 
     bool success = static_cast<bool>(getline(cin, buffer));
     auto a_opt = check_input<int64_t>(std::move(buffer));
-    if(a_opt!=nullopt)
-        success &= ((*a_opt %= alphabet_size)==1) || gcd(*a_opt, alphabet_size);
 
+    if(a_opt!=nullopt)
+        success &= ((*a_opt %= alphabet_size)==1) || (gcd(*a_opt, alphabet_size)==1);
 
     cout << u8"b=";
     success &= static_cast<bool>(getline(cin, buffer));
